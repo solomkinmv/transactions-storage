@@ -1,4 +1,4 @@
-package io.github.solomkinmv.transactions.persistence.configuration;
+package io.github.solomkinmv.transactions.configuration;
 
 import io.github.solomkinmv.transactions.persistence.InMemoryTransactionsRepository;
 import io.github.solomkinmv.transactions.persistence.TransactionsRepository;
