@@ -37,7 +37,7 @@ file for all submitted transactions
 
 ### Get transaction
 
-`curl --location --request GET 'localhost:8080/transactions/123'` where `123` is invoice id
+`curl --location --request GET 'localhost:8080/transactions/1234567'` where `1234567` is invoice id
 
 ## TODO
 
