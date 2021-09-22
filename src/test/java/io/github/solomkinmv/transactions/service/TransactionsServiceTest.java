@@ -5,6 +5,7 @@ import io.github.solomkinmv.transactions.controller.dto.SubmitTransactionRequest
 import io.github.solomkinmv.transactions.controller.dto.TransactionErrorResponse;
 import io.github.solomkinmv.transactions.persistence.TransactionsRepository;
 import io.github.solomkinmv.transactions.persistence.model.Transaction;
+import io.github.solomkinmv.transactions.service.audit.AuditWriter;
 import io.github.solomkinmv.transactions.service.converter.TransactionSanitizer;
 import io.github.solomkinmv.transactions.service.validate.ValidationResult;
 import io.github.solomkinmv.transactions.service.validate.ValidationService;
@@ -38,10 +39,13 @@ class TransactionsServiceTest {
     private ValidationService validationService;
     @Mock
     private TransactionSanitizer transactionSanitizer;
+    @Mock
+    private AuditWriter auditWriter;
 
     @BeforeEach
     void setUp() {
-        transactionsService = new TransactionsService(repository, validationService, transactionSanitizer);
+        transactionsService = new TransactionsService(repository, validationService,
+                                                      transactionSanitizer, auditWriter);
     }
 
     @Test
@@ -55,6 +59,7 @@ class TransactionsServiceTest {
                 .contains(TRANSACTION_ERROR_RESPONSE);
         verifyNoInteractions(repository);
         verifyNoInteractions(transactionSanitizer);
+        verifyNoInteractions(auditWriter);
     }
 
     @Test
@@ -67,6 +72,7 @@ class TransactionsServiceTest {
         assertThat(actualResult)
                 .isEmpty();
         verify(repository).save(VALID_TRANSACTION);
+        verify(auditWriter).onSubmit(VALID_TRANSACTION);
         verifyNoInteractions(transactionSanitizer);
     }
 
@@ -82,6 +88,7 @@ class TransactionsServiceTest {
         assertThat(actualResult)
                 .contains(SANITIZED_TRANSACTION_RESPONSE);
         verifyNoInteractions(validationService);
+        verifyNoInteractions(auditWriter);
     }
 
     @Test
@@ -94,5 +101,6 @@ class TransactionsServiceTest {
         assertThat(actualResult).isEmpty();
         verifyNoInteractions(transactionSanitizer);
         verifyNoInteractions(validationService);
+        verifyNoInteractions(auditWriter);
     }
 }

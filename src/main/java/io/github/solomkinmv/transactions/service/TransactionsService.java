@@ -4,6 +4,7 @@ import io.github.solomkinmv.transactions.controller.dto.SanitizedTransactionResp
 import io.github.solomkinmv.transactions.controller.dto.SubmitTransactionRequest;
 import io.github.solomkinmv.transactions.controller.dto.TransactionErrorResponse;
 import io.github.solomkinmv.transactions.persistence.TransactionsRepository;
+import io.github.solomkinmv.transactions.service.audit.AuditWriter;
 import io.github.solomkinmv.transactions.service.converter.TransactionSanitizer;
 import io.github.solomkinmv.transactions.service.validate.ValidationResult;
 import io.github.solomkinmv.transactions.service.validate.ValidationService;
@@ -19,6 +20,7 @@ public class TransactionsService {
     private final TransactionsRepository repository;
     private final ValidationService validator;
     private final TransactionSanitizer transactionSanitizer;
+    private final AuditWriter auditWriter;
 
     public Optional<TransactionErrorResponse> submitTransaction(SubmitTransactionRequest transactionRequest) {
         ValidationResult validationResult = validator.validate(transactionRequest);
@@ -26,6 +28,7 @@ public class TransactionsService {
             return Optional.of(validationResult.errorResponse());
         }
         repository.save(validationResult.validTransaction());
+        auditWriter.onSubmit(validationResult.validTransaction());
         return Optional.empty();
     }
 
