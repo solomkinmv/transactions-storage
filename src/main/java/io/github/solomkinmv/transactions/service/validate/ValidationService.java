@@ -23,15 +23,18 @@ public class ValidationService {
     private final TransactionConverter converter;
 
     public ValidationResult validate(SubmitTransactionRequest transactionRequest) {
+        CardholderErrorResponse cardholderErrorResponse = new CardholderErrorResponse(
+                nameValidator.validate(transactionRequest),
+                emailValidator.validate(transactionRequest));
+        CardErrorResponse cardErrorResponse = new CardErrorResponse(panValidator.validate(transactionRequest),
+                                                                    expiryValidator.validate(transactionRequest),
+                                                                    cvvValidator.validate(transactionRequest));
         TransactionErrorResponse transactionErrorResponse =
                 new TransactionErrorResponse(invoiceValidator.validate(transactionRequest),
                                              amountValidator.validate(transactionRequest),
                                              currencyValidator.validate(transactionRequest),
-                                             new CardholderErrorResponse(nameValidator.validate(transactionRequest),
-                                                                         emailValidator.validate(transactionRequest)),
-                                             new CardErrorResponse(panValidator.validate(transactionRequest),
-                                                                   expiryValidator.validate(transactionRequest),
-                                                                   cvvValidator.validate(transactionRequest)));
+                                             cardholderErrorResponse.hasErrors() ? cardholderErrorResponse : null,
+                                             cardErrorResponse.hasErrors() ? cardErrorResponse : null);
         if (transactionErrorResponse.hasErrors()) {
             return new ValidationResult(null, transactionErrorResponse);
         }
