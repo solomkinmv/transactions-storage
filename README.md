@@ -5,6 +5,8 @@
 ## Requirements to run locally
 
 * JDK 16
+* Download `jar`
+  release [here](https://github.com/solomkinmv/transactions-storage/releases/download/v0.0.1/transactions-storage-0.0.1.jar)
 
 ## Local run
 
